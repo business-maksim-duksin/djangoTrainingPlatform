@@ -1,4 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
 from rest_framework import generics, permissions, viewsets, mixins
 from django.db.models import Q, Count
 
@@ -55,6 +56,9 @@ class CourseView(OwnerPerformCreateMixin,
     serializer_class = s.CourseSerializer
     queryset = m.Course.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [filters.SearchFilter,]
+    search_fields = ["name",]
+
 
     def get_queryset(self):
         """Member of the course or it's creator"""
@@ -84,6 +88,9 @@ class LessonView(OwnerPerformCreateMixin,
     serializer_class = s.LessonSerializer
     queryset = m.Lesson.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["course", ]
+    search_fields = ["name", ]
 
     def get_queryset(self):
         """All lessons of courses where user is it's member or user is creator of the course. """
@@ -113,6 +120,9 @@ class TaskView(OwnerPerformCreateMixin,
     serializer_class = s.TaskSerializer
     queryset = m.Task.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["lesson", ]
+    search_fields = ["content", ]
 
     def get_queryset(self):
         """All tasks of courses where user is it's member or user is creator of the course. """
@@ -148,6 +158,10 @@ class CompletedTaskView(OwnerPerformCreateMixin,
     permission_classes = (permissions.IsAuthenticated,)
     # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
     # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["task", ]
+    search_fields = ["content", ]
 
     def get_queryset(self):
         """
@@ -186,6 +200,8 @@ class GradeView(OwnerPerformCreateMixin,
     serializer_class = s.GradeSerializer
     queryset = m.Grade.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, ]
+    filterset_fields = ["completed_task", "amount"]
 
     def get_queryset(self):
         """
@@ -221,6 +237,9 @@ class CommentView(OwnerPerformCreateMixin,
     serializer_class = s.GradeSerializer
     queryset = m.Grade.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ["grade", ]
+    search_fields = ["content", ]
 
     def get_queryset(self):
         """
