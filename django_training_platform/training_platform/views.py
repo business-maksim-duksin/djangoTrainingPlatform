@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, viewsets, mixins
 from django.db.models import Q, Count
 
@@ -145,6 +146,8 @@ class CompletedTaskView(OwnerPerformCreateMixin,
     # for some reason Exists('grade') gives AttributeError: 'str' object has no attribute 'order_by'  # INVESTIGATE
     queryset = m.CompletedTask.objects.all().annotate(grade_present=Count('grade'))
     permission_classes = (permissions.IsAuthenticated,)
+    # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
+    # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present
 
     def get_queryset(self):
         """
@@ -184,6 +187,20 @@ class GradeView(OwnerPerformCreateMixin,
     queryset = m.Grade.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_queryset(self):
+        """
+        User is teacher:
+           all grades in associated courses where teacher is still a member
+        User is student:
+            all grades for student's completed_tasks
+        """
+        user = self.request.user
+        if user.is_teacher:
+            queryset = self.queryset.filter(completed_task__task__lesson__course__memberships__user=user)
+        else:
+            queryset = self.queryset.filter(completed_task__owner=user)
+        return queryset
+
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
@@ -204,6 +221,20 @@ class CommentView(OwnerPerformCreateMixin,
     serializer_class = s.GradeSerializer
     queryset = m.Grade.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """
+        User is teacher:
+           all comments associated with teachers grades
+        User is student:
+            all comments derived from student's completed_tasks
+        """
+        user = self.request.user
+        if user.is_teacher:
+            queryset = self.queryset.filter(grade__owner=user)
+        else:
+            queryset = self.queryset.filter(grade__completed_task__owner=user)
+        return queryset
 
     def get_permissions(self):
         """
