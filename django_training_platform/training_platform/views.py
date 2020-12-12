@@ -1,19 +1,9 @@
 from rest_framework import generics, permissions, viewsets, mixins
-from django.db.models import Q
+from django.db.models import Q, Count
 
-from .models import Course
-from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse,\
-    IsTaskRelatedToCourse,  IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse,\
+from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
+    IsTaskRelatedToCourse, IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse, \
     IsMembershipRelatedToCourse
-from .serializers import (
-    UserSerializer,
-    CourseSerializer,
-    LessonSerializer,
-    TaskSerializer,
-    # CourceSerializer2,
-    # CourceSerializer3,
-
-)
 
 from . import serializers as s
 from . import models as m
@@ -23,7 +13,7 @@ from .mixins import OwnerPerformCreateMixin
 
 class UserCreateView(generics.CreateAPIView):
     # queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = s.UserSerializer
     permission_classes = (permissions.AllowAny,)
 
 
@@ -40,7 +30,7 @@ class MembershipView(mixins.CreateModelMixin,
     def get_queryset(self):
         """User's memberships"""
         user = self.request.user
-        return m.Membership.objects.filter(user=user)
+        return self.queryset.filter(user=user)
 
     def get_permissions(self):
         """
@@ -68,8 +58,8 @@ class CourseView(OwnerPerformCreateMixin,
     def get_queryset(self):
         """Member of the course or it's creator"""
         user = self.request.user
-        return m.Course.objects.filter(Q(memberships__user=user) |
-                                       Q(owner=user))
+        return self.queryset.filter(Q(memberships__user=user) |
+                                    Q(owner=user))
 
     def get_permissions(self):
         """
@@ -90,9 +80,15 @@ class CourseView(OwnerPerformCreateMixin,
 class LessonView(OwnerPerformCreateMixin,
                  viewsets.ModelViewSet):
     """Lesson"""
-    serializer_class = LessonSerializer
+    serializer_class = s.LessonSerializer
     queryset = m.Lesson.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """All lessons of courses where user is it's member or user is creator of the course. """
+        user = self.request.user
+        return self.queryset.filter(Q(course__memberships__user=user) |
+                                    Q(owner=user))
 
     def get_permissions(self):
         """
@@ -113,9 +109,15 @@ class LessonView(OwnerPerformCreateMixin,
 class TaskView(OwnerPerformCreateMixin,
                viewsets.ModelViewSet):
     """Task"""
-    serializer_class = TaskSerializer
+    serializer_class = s.TaskSerializer
     queryset = m.Task.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """All tasks of courses where user is it's member or user is creator of the course. """
+        user = self.request.user
+        return self.queryset.filter(Q(lesson__course__memberships__user=user) |
+                                    Q(owner=user))
 
     def get_permissions(self):
         """
@@ -140,8 +142,23 @@ class CompletedTaskView(OwnerPerformCreateMixin,
                         viewsets.GenericViewSet):
     """Completed task"""
     serializer_class = s.CompletedTaskSerializer
-    queryset = m.CompletedTask.objects.all()
+    # for some reason Exists('grade') gives AttributeError: 'str' object has no attribute 'order_by'  # INVESTIGATE
+    queryset = m.CompletedTask.objects.all().annotate(grade_present=Count('grade'))
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """
+        User is teacher:
+            all completed tasks where teacher is a member of the course.
+        User is student:
+            user's own completed tasks.
+        """
+        user = self.request.user
+        if user.is_teacher:
+            queryset = self.queryset.filter(task__lesson__course__memberships__user=user)
+        else:
+            queryset = self.queryset.filter(owner=user)
+        return queryset
 
     def get_permissions(self):
         """
