@@ -15,16 +15,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+# )
 from . import views
+from rest_framework.routers import DefaultRouter
 
 urlpatterns = [
-    path('register', views.UserCreateView.as_view()),
-
+    # path('register', views.UserCreateView.as_view()),
+    # path('token', TokenObtainPairView.as_view()),
+    # path('token/refresh', TokenRefreshView.as_view()),
 ]
 
-from rest_framework.routers import DefaultRouter
-from . import views
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
@@ -35,7 +38,6 @@ router.register(r"tasks", views.TaskView)
 router.register(r"completed_tasks", views.CompletedTaskView)
 router.register(r"grades", views.GradeView)
 router.register(r"comments", views.CommentView)
-
 
 # The API URLs are now determined automatically by the router.
 urlpatterns += [
