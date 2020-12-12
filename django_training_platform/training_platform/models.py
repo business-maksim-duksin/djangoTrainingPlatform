@@ -21,6 +21,11 @@ class OwnedModel(models.Model):
         abstract = True
 
 
+# class CourseScopeModel(CourseScopeModelInterface, OwnedModel,):     #  INVESTIGATE
+#     pass
+# training_platform.Comment.grade: (models.E006) The field 'grade' clashes with the field 'grade'
+# from model 'training_platform.coursescopemodel'
+
 class Course(CourseScopeModelInterface, OwnedModel, ):
     name = models.CharField(max_length=150)
     description = models.TextField(blank=True, )
@@ -33,7 +38,7 @@ class Course(CourseScopeModelInterface, OwnedModel, ):
         return f"Course {self.id} {self.name}"
 
 
-class Membership(models.Model):
+class Membership(OwnedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="memberships")
 
