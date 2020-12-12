@@ -63,10 +63,12 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class CompletedTaskSerializer(serializers.ModelSerializer):
+    grade_present = serializers.IntegerField()
+
     class Meta:
         model = m.CompletedTask
         fields = "__all__"
-        read_only_fields = ["owner"]
+        read_only_fields = ["owner", "grade_present"]
 
 
 class GradeSerializer(serializers.ModelSerializer):
