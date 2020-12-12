@@ -29,10 +29,16 @@ class Course(CourseScopeModelInterface, OwnedModel, ):
     def courseroot(self):
         return self
 
+    def __str__(self):
+        return f"Course {self.id} {self.name}"
+
 
 class Membership(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="memberships")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="memberships")
+
+    def __str__(self):
+        return f"Membership U {self.user} C {self.course}"
 
 
 class Lesson(CourseScopeModelInterface, OwnedModel, ):
@@ -45,6 +51,9 @@ class Lesson(CourseScopeModelInterface, OwnedModel, ):
     def courseroot(self):
         return self.course.courseroot
 
+    def __str__(self):
+        return f"Lesson {self.id} {self.name}"
+
 
 class Task(CourseScopeModelInterface, OwnedModel, ):
     content = models.TextField(blank=True, )
@@ -53,6 +62,9 @@ class Task(CourseScopeModelInterface, OwnedModel, ):
     @property
     def courseroot(self):
         return self.lesson.courseroot
+
+    def __str__(self):
+        return f"Task {self.id}"
 
 
 class CompletedTask(CourseScopeModelInterface, OwnedModel, ):
@@ -63,6 +75,9 @@ class CompletedTask(CourseScopeModelInterface, OwnedModel, ):
     def courseroot(self):
         return self.task.courseroot
 
+    def __str__(self):
+        return f"CompletedTask {self.id}"
+
 
 class Grade(CourseScopeModelInterface, OwnedModel, ):
     amount = models.IntegerField()
@@ -72,6 +87,9 @@ class Grade(CourseScopeModelInterface, OwnedModel, ):
     def courseroot(self):
         return self.completed_task.courseroot
 
+    def __str__(self):
+        return f"Grade {self.id} {self.amount}"
+
 
 class Comment(CourseScopeModelInterface, OwnedModel, ):
     content = models.TextField(blank=True)
@@ -80,4 +98,7 @@ class Comment(CourseScopeModelInterface, OwnedModel, ):
     @property
     def courseroot(self):
         return self.grade.courseroot
+
+    def __str__(self):
+        return f"Comment {self.id}"
 
