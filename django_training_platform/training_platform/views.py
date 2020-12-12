@@ -159,9 +159,6 @@ class CompletedTaskView(OwnerPerformCreateMixin,
     # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
     # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ["task", ]
-    search_fields = ["content", ]
 
     def get_queryset(self):
         """
