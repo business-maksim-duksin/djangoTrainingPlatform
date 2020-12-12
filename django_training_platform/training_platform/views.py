@@ -1,8 +1,10 @@
 from rest_framework import generics, permissions, viewsets, mixins
+from django.db.models import Q
 
 from .models import Course
-from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse,\
-    IsTaskRelatedToCourse,  IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse
+from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse,\
+    IsTaskRelatedToCourse,  IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse,\
+    IsMembershipRelatedToCourse
 from .serializers import (
     UserSerializer,
     CourseSerializer,
@@ -35,6 +37,26 @@ class MembershipView(mixins.CreateModelMixin,
     queryset = m.Membership.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
 
+    def get_queryset(self):
+        """User's memberships"""
+        user = self.request.user
+        return m.Membership.objects.filter(user=user)
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        create(), retrieve(), update(), partial_update(), destroy() and list()
+        """
+        if self.action == "create":
+            permission_classes = [permissions.IsAuthenticated, IsTeacher, IsMembershipRelatedToCourse]
+        elif self.action in ["retrieve", "list"]:
+            permission_classes = [permissions.IsAuthenticated, IsCourseMemberOrOwner]
+        elif self.action in ["destroy"]:
+            permission_classes = [permissions.IsAuthenticated, IsTeacher, IsCourseMemberOrOwner]
+        else:
+            permission_classes = self.permission_classes
+        return [permission() for permission in permission_classes]
+
 
 class CourseView(OwnerPerformCreateMixin,
                  viewsets.ModelViewSet):
@@ -42,6 +64,12 @@ class CourseView(OwnerPerformCreateMixin,
     serializer_class = s.CourseSerializer
     queryset = m.Course.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        """Member of the course or it's creator"""
+        user = self.request.user
+        return m.Course.objects.filter(Q(memberships__user=user) |
+                                       Q(owner=user))
 
     def get_permissions(self):
         """

@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import OwnedModel, CourseScopeModelInterface, Course, Lesson, Task, CompletedTask, Grade, Comment
+from .models import OwnedModel, CourseScopeModelInterface, Course, Lesson, Task, CompletedTask, Grade, Comment, Membership
 
 
 class IsTeacher(permissions.BasePermission):
@@ -33,7 +33,7 @@ class IsObjRelatedToCourseBase(permissions.BasePermission):
 
     I could do dynamic class construction, but it is too scary for me for now.
     """
-    message = "User is not a Member of the Course "
+    message = "User is not a Member of the Course. "
 
     # def __init__(self, obj: CourseScopeModelInterface, foreign_key: str):
     #     self.obj = obj
@@ -43,7 +43,8 @@ class IsObjRelatedToCourseBase(permissions.BasePermission):
     def has_permission(self, request, view, obj: CourseScopeModelInterface, foreign_key: str):
         foreign_key_id = request.data.get(foreign_key)
         if foreign_key_id:
-            return bool(obj.objects.get(id=foreign_key_id).courseroot.memberships.filter(user=request.user).exists())
+            return bool(obj.objects.get(id=foreign_key_id).courseroot.memberships.filter(user=request.user).exists() or
+                        obj.objects.get(id=foreign_key_id).courseroot.owner == request.user)
         else:
             return False
 
@@ -102,3 +103,13 @@ class IsCommentRelatedToCourse(IsObjRelatedToCourseBase):
 
     def has_permission(self, request, view):
         return super().has_permission(request, view, Grade, "grade", )
+
+
+class IsMembershipRelatedToCourse(IsObjRelatedToCourseBase):
+    """
+    I could do dynamic class construction, but it is too scary for me for now.
+    Or i don't understand how perform this check properly.
+    """
+
+    def has_permission(self, request, view):
+        return super().has_permission(request, view, Course, "course", )
