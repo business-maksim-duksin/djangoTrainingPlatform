@@ -19,10 +19,7 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    # path("course", views.CourceView.as_view()),
     path('register', views.UserCreateView.as_view()),
-    # path('lesson', views.LessonView.as_view()),
-    # path('task', views.TaskView.as_view()),
 
 ]
 
