@@ -231,8 +231,8 @@ class GradeView(OwnerPerformCreateMixin,
 class CommentView(OwnerPerformCreateMixin,
                   viewsets.ModelViewSet):
     """Comment for a grade"""
-    serializer_class = s.GradeSerializer
-    queryset = m.Grade.objects.all()
+    serializer_class = s.CommentSerializer
+    queryset = m.Comment.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ["grade", ]
