@@ -1,6 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from rest_framework import generics, permissions, viewsets, mixins
+from rest_framework import permissions, viewsets, mixins
 from django.db.models import Q, Count
 
 from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
@@ -11,12 +11,6 @@ from . import serializers as s
 from . import models as m
 
 from .mixins import OwnerPerformCreateMixin
-
-
-class UserCreateView(generics.CreateAPIView):
-    # queryset = User.objects.all()
-    serializer_class = s.UserSerializer
-    permission_classes = (permissions.AllowAny,)
 
 
 class MembershipView(mixins.CreateModelMixin,
@@ -56,9 +50,8 @@ class CourseView(OwnerPerformCreateMixin,
     serializer_class = s.CourseSerializer
     queryset = m.Course.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
-    filter_backends = [filters.SearchFilter,]
-    search_fields = ["name",]
-
+    filter_backends = [filters.SearchFilter, ]
+    search_fields = ["name", ]
 
     def get_queryset(self):
         """Member of the course or it's creator"""
@@ -158,7 +151,6 @@ class CompletedTaskView(OwnerPerformCreateMixin,
     permission_classes = (permissions.IsAuthenticated,)
     # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
     # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present
-
 
     def get_queryset(self):
         """

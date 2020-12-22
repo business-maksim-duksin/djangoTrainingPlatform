@@ -39,15 +39,15 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'rest_framework.authtoken',
     # 'djoser',
-
+    'users',
     'training_platform',
 ]
 
-# i just can't pair swagger nor with vanilla auth nor with djoser, sad(
+# i just can't pair swagger nor with vanilla user nor with djoser, sad(
 # LOGIN_URL = 'apiauth/login'
 # LOGOUT_URL = 'apiauth/logout'
 
-AUTH_USER_MODEL = 'training_platform.User'
+AUTH_USER_MODEL = 'users.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

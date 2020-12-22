@@ -1,6 +1,9 @@
 # Create your models here.
-from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 from django.db import models
+
+
+User = settings.AUTH_USER_MODEL
 
 
 class CourseScopeModelInterface:
@@ -8,10 +11,6 @@ class CourseScopeModelInterface:
     def courseroot(self):
         """Must be a property"""
         raise NotImplementedError
-
-
-class User(AbstractUser):
-    is_teacher = models.BooleanField('teacher status', default=False)
 
 
 class OwnedModel(models.Model):
@@ -106,4 +105,3 @@ class Comment(CourseScopeModelInterface, OwnedModel, ):
 
     def __str__(self):
         return f"Comment {self.id}"
-
