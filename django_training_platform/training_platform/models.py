@@ -8,7 +8,7 @@ User = settings.AUTH_USER_MODEL
 
 class CourseScopeModelInterface:
     """Return course instance"""
-    def courseroot(self):
+    def get_associated_course(self):
         """Must be a property"""
         raise NotImplementedError
 
@@ -30,7 +30,7 @@ class Course(CourseScopeModelInterface, OwnedModel, ):
     description = models.TextField(blank=True, )
 
     @property
-    def courseroot(self):
+    def get_associated_course(self):
         return self
 
     def __str__(self):
@@ -52,8 +52,8 @@ class Lesson(CourseScopeModelInterface, OwnedModel, ):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="lessons",)
 
     @property
-    def courseroot(self):
-        return self.course.courseroot
+    def get_associated_course(self):
+        return self.course.get_associated_course
 
     def __str__(self):
         return f"Lesson {self.id} {self.name}"
@@ -64,8 +64,8 @@ class Task(CourseScopeModelInterface, OwnedModel, ):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="tasks",)
 
     @property
-    def courseroot(self):
-        return self.lesson.courseroot
+    def get_associated_course(self):
+        return self.lesson.get_associated_course
 
     def __str__(self):
         return f"Task {self.id}"
@@ -76,8 +76,8 @@ class CompletedTask(CourseScopeModelInterface, OwnedModel, ):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="completed_tasks",)
 
     @property
-    def courseroot(self):
-        return self.task.courseroot
+    def get_associated_course(self):
+        return self.task.get_associated_course
 
     def __str__(self):
         return f"CompletedTask {self.id}"
@@ -88,8 +88,8 @@ class Grade(CourseScopeModelInterface, OwnedModel, ):
     completed_task = models.OneToOneField(CompletedTask, on_delete=models.CASCADE, related_name="grade",)
 
     @property
-    def courseroot(self):
-        return self.completed_task.courseroot
+    def get_associated_course(self):
+        return self.completed_task.get_associated_course
 
     def __str__(self):
         return f"Grade {self.id} {self.amount}"
@@ -100,8 +100,8 @@ class Comment(CourseScopeModelInterface, OwnedModel, ):
     grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name="comments", null=True)
 
     @property
-    def courseroot(self):
-        return self.grade.courseroot
+    def get_associated_course(self):
+        return self.grade.get_associated_course
 
     def __str__(self):
         return f"Comment {self.id}"
