@@ -21,6 +21,7 @@ urlpatterns = [
 
 ]
 
+app_name = 'platform'
 
 # Create a router and register our viewsets with it.
 router = DefaultRouter()

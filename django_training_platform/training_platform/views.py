@@ -51,7 +51,7 @@ class CourseView(OwnerPerformCreateMixin,
     queryset = m.Course.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
     filter_backends = [filters.SearchFilter, ]
-    search_fields = ["name", ]
+    search_fields = ["name", "description"]
 
     def get_queryset(self):
         """Member of the course or it's creator"""
