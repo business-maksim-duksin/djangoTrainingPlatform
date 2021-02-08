@@ -3,7 +3,7 @@ from rest_framework import filters
 from rest_framework import permissions, viewsets, mixins
 from django.db.models import Q, Count
 
-from .permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
+from core.permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
     IsTaskRelatedToCourse, IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse, \
     IsMembershipRelatedToCourse
 

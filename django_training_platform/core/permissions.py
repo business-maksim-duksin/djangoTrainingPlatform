@@ -1,5 +1,5 @@
 from rest_framework import permissions
-from .models import OwnedModel, CourseScopeModelInterface, Course, Lesson, Task, CompletedTask, Grade, Comment, Membership
+from training_platform.models import OwnedModel, CourseScopeModelInterface, Course, Lesson, Task, CompletedTask, Grade, Comment, Membership
 
 
 class IsTeacher(permissions.BasePermission):
@@ -23,7 +23,6 @@ class IsCourseMemberOrOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj: CourseScopeModelInterface):
         return bool(obj.get_associated_course.memberships.filter(user=request.user).exists() or
                     obj.get_associated_course.owner == request.user)
-
 
 
 class IsObjRelatedToCourseBase(permissions.BasePermission):
