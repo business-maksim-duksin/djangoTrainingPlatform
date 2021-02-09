@@ -62,7 +62,7 @@ class Lesson(CourseScopeModelInterface, OwnedModel, ):
 class Task(CourseScopeModelInterface, OwnedModel, ):
     content = models.TextField(blank=True, )
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="tasks",)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="tasks", )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="tasks", null=True)
 
     @property
     def get_associated_course(self):
@@ -75,7 +75,7 @@ class Task(CourseScopeModelInterface, OwnedModel, ):
 class CompletedTask(CourseScopeModelInterface, OwnedModel, ):
     content = models.TextField(blank=True, )
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name="completed_tasks",)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="completed_tasks", )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="completed_tasks", null=True)
 
     @property
     def get_associated_course(self):
@@ -88,7 +88,7 @@ class CompletedTask(CourseScopeModelInterface, OwnedModel, ):
 class Grade(CourseScopeModelInterface, OwnedModel, ):
     amount = models.IntegerField()
     completed_task = models.OneToOneField(CompletedTask, on_delete=models.CASCADE, related_name="grade",)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="grades", )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="grades", null=True)
 
     @property
     def get_associated_course(self):
@@ -101,7 +101,7 @@ class Grade(CourseScopeModelInterface, OwnedModel, ):
 class Comment(CourseScopeModelInterface, OwnedModel, ):
     content = models.TextField(blank=True)
     grade = models.ForeignKey(Grade, on_delete=models.CASCADE, related_name="comments", null=True)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="comments", )
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="comments", null=True)
 
     @property
     def get_associated_course(self):
