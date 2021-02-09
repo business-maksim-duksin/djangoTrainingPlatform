@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import permissions, viewsets, mixins
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Exists, OuterRef
 
 from core.permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
     IsTaskRelatedToCourse, IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse, \
@@ -146,8 +146,8 @@ class CompletedTaskView(OwnerPerformCreateMixin,
                         viewsets.GenericViewSet):
     """Completed task"""
     serializer_class = s.CompletedTaskSerializer
-    # for some reason Exists('grade') gives AttributeError: 'str' object has no attribute 'order_by'  # INVESTIGATE
-    queryset = m.CompletedTask.objects.all().annotate(grade_present=Count('grade'))
+    queryset = m.CompletedTask.objects.all()\
+        .annotate(grade_present=Exists(m.Grade.objects.filter(completed_task=OuterRef('pk'))))
     permission_classes = (permissions.IsAuthenticated,)
     # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
     # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present

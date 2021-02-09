@@ -48,12 +48,12 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class CompletedTaskSerializer(serializers.ModelSerializer):
-    grade_present = serializers.IntegerField()
+    grade_present = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = m.CompletedTask
-        fields = "__all__"
-        read_only_fields = ["owner", "grade_present"]
+        fields = ["id", "owner", "content", "task", "grade_present"]
+        read_only_fields = ["owner", ]
 
 
 class GradeSerializer(serializers.ModelSerializer):
