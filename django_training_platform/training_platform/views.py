@@ -120,7 +120,7 @@ class TaskView(OwnerPerformCreateMixin,
     def get_queryset(self):
         """All tasks of courses where user is it's member or user is creator of the course. """
         user = self.request.user
-        return self.queryset.filter(Q(lesson__course__memberships__user=user) |
+        return self.queryset.filter(Q(course__memberships__user=user) |
                                     Q(owner=user))
 
     def get_permissions(self):
@@ -161,7 +161,7 @@ class CompletedTaskView(OwnerPerformCreateMixin,
         """
         user = self.request.user
         if user.is_teacher:
-            queryset = self.queryset.filter(task__lesson__course__memberships__user=user)
+            queryset = self.queryset.filter(course__memberships__user=user)
         else:
             queryset = self.queryset.filter(owner=user)
         return queryset
@@ -201,7 +201,7 @@ class GradeView(OwnerPerformCreateMixin,
         """
         user = self.request.user
         if user.is_teacher:
-            queryset = self.queryset.filter(completed_task__task__lesson__course__memberships__user=user)
+            queryset = self.queryset.filter(course__memberships__user=user)
         else:
             queryset = self.queryset.filter(completed_task__owner=user)
         return queryset
