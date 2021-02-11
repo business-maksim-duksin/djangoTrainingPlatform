@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework import permissions, viewsets, mixins
-from django.db.models import Q, Count, Exists, OuterRef
+from django.db.models import Q, Count, Exists, OuterRef, Subquery
 
 from core.permissions import IsTeacher, IsObjOwner, IsCourseMemberOrOwner, IsLessonRelatedToCourse, \
     IsTaskRelatedToCourse, IsCompletedTaskRelatedToCourse, IsGradeRelatedToCourse, IsCommentRelatedToCourse, \
@@ -13,7 +13,8 @@ from . import models as m
 from .mixins import OwnerPerformCreateMixin
 
 
-class MembershipView(mixins.CreateModelMixin,
+class MembershipView(OwnerPerformCreateMixin,
+                     mixins.CreateModelMixin,
                      mixins.DestroyModelMixin,
                      mixins.ListModelMixin,
                      mixins.RetrieveModelMixin,
@@ -34,7 +35,7 @@ class MembershipView(mixins.CreateModelMixin,
         create(), retrieve(), update(), partial_update(), destroy() and list()
         """
         if self.action == "create":
-            permission_classes = [permissions.IsAuthenticated, IsTeacher, IsMembershipRelatedToCourse]
+            permission_classes = [permissions.IsAuthenticated, IsTeacher, IsCourseMemberOrOwner]
         elif self.action in ["retrieve", "list"]:
             permission_classes = [permissions.IsAuthenticated, IsCourseMemberOrOwner]
         elif self.action in ["destroy"]:
@@ -56,8 +57,17 @@ class CourseView(OwnerPerformCreateMixin,
     def get_queryset(self):
         """Member of the course or it's creator"""
         user = self.request.user
-        return self.queryset.filter(Q(memberships__user=user) |
-                                    Q(owner=user))
+        # return self.queryset.filter(
+        #                             Q(memberships__user=user) |
+        #                             Q(owner=user)
+        #                             )
+        user_subscribed_courses_qs = Subquery(m.Membership.objects.all().filter(user=user).values('course'))
+        return self.queryset.filter(
+                                    Q(id__in=user_subscribed_courses_qs) |
+                                    Q(owner=user)
+                                    )
+        # sub_queryset_2 =
+        # return sub_queryset_1
 
     def get_permissions(self):
         """
@@ -146,9 +156,10 @@ class CompletedTaskView(OwnerPerformCreateMixin,
                         viewsets.GenericViewSet):
     """Completed task"""
     serializer_class = s.CompletedTaskSerializer
-    queryset = m.CompletedTask.objects.all()\
+    queryset = m.CompletedTask.objects.all() \
         .annotate(grade_present=Exists(m.Grade.objects.filter(completed_task=OuterRef('pk'))))
     permission_classes = (permissions.IsAuthenticated,)
+
     # filter_backends = [DjangoFilterBackend]    # INVESTIGATE
     # filterset_fields = ["grade_present", ]  #TypeError: 'Meta.fields' must not contain non-model field names: grade_present
 
