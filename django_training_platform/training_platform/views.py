@@ -98,8 +98,12 @@ class LessonView(OwnerPerformCreateMixin,
     def get_queryset(self):
         """All lessons of courses where user is it's member or user is creator of the course. """
         user = self.request.user
-        return self.queryset.filter(Q(course__memberships__user=user) |
-                                    Q(owner=user))
+        user_subscribed_courses_qs = Subquery(m.Membership.objects.all().filter(user=user).values('course'))
+        user_subscribed_courses_or_owner_qs = m.Course.objects.all().filter(
+                                                                            Q(id__in=user_subscribed_courses_qs) |
+                                                                            Q(owner=user)
+                                                                            ).values('pk')
+        return self.queryset.filter(course__id__in=user_subscribed_courses_or_owner_qs)
 
     def get_permissions(self):
         """
