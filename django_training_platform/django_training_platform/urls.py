@@ -16,22 +16,45 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from .yasg import urlpatterns as doc_urls
+import debug_toolbar
 
 #
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 # # urlpatterns += doc_urls
-urlpatterns = [
+sub_urlpatterns_api_v1 = [
     # path('admin/', admin.site.urls),
     # path('apiauth/', include('rest_framework.urls')),
-    re_path(r'^api/v1/', include('training_platform.urls', namespace='v1')),
-    re_path(r'^api/v1/', include('users.urls', namespace='v1')),
+    # re_path(r'^api/v1/', include('training_platform.urls', namespace='v1')),
+    # re_path(r'^api/v1/', include('users.urls', namespace='v1')),
+
+    re_path('', include('training_platform.urls', )),
+    re_path('', include('users.urls', )),
 
 ]
-urlpatterns += [
+
+# sub_urlpatterns += [
+#     # YOUR PATTERNS
+#     path('api/v1/schema/', SpectacularAPIView.as_view(api_version='v1',), name='schema'),
+#     # Optional UI:
+#     path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+#     path('api/v1/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+#
+#     path('__debug__/', include(debug_toolbar.urls)),
+# ]
+
+sub_urlpatterns_api_v1 += [
     # YOUR PATTERNS
-    path('api/v1/schema/', SpectacularAPIView.as_view(api_version='v1',), name='schema'),
+    path('schema/', SpectacularAPIView.as_view(api_version='v1',), name='schema'),
     # Optional UI:
-    path('api/v1/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/v1/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+    # path('__debug__/', include(debug_toolbar.urls)),
+]
+foo = []
+urlpatterns = [
+    re_path(r'^api/v1/', include((sub_urlpatterns_api_v1, 'v1'), namespace='v1')),
+    re_path(r'^api/v2/', include((sub_urlpatterns_api_v1, 'v2'), namespace='v2')),
+    path('__debug__/', include(debug_toolbar.urls)),
 ]
