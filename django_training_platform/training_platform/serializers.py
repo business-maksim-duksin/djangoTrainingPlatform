@@ -22,8 +22,8 @@ from . import models as m
 class MembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = m.Membership
-        fields = "__all__"
-        read_only_fields = ["__all__"]
+        fields = ["course", "user", "owner"]
+        read_only_fields = ["owner"]
 
 
 class CourseSerializer(serializers.ModelSerializer):
