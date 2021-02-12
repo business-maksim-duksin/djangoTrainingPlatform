@@ -9,7 +9,7 @@ from rest_framework.routers import DefaultRouter
 app_name = 'users'
 
 urlpatterns = [
-    path('register', UserCreateView.as_view()),
+    path('register', UserCreateView.as_view(), name='register'),
     path('token', TokenObtainPairView.as_view()),
     path('token/refresh', TokenRefreshView.as_view()),
     # path('users', UserListView.as_view()),
@@ -20,3 +20,5 @@ router.register(r"users", UserListView)
 urlpatterns += [
     path('', include(router.urls)),
 ]
+
+# urlpatterns += router.urls

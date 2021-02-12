@@ -21,8 +21,11 @@ class IsCourseMemberOrOwner(permissions.BasePermission):
     message = "You have to be a Member of the course to perform this action."
 
     def has_object_permission(self, request, view, obj: CourseScopeModelInterface):
+        # course = Course.objects.select_related('memberships').get(id=obj)
         return bool(obj.course.memberships.filter(user=request.user).exists() or
                     obj.course.owner == request.user)
+        # return bool(course.memberships.filter(user=request.user).exists() or
+        #             course.owner == request.user)
 
 
 class IsObjRelatedToCourseBase(permissions.BasePermission):
@@ -42,6 +45,7 @@ class IsObjRelatedToCourseBase(permissions.BasePermission):
     def has_permission(self, request, view, obj: CourseScopeModelInterface, foreign_key: str):
         foreign_key_id = request.data.get(foreign_key)
         if foreign_key_id:
+
             return bool(obj.objects.get(id=foreign_key_id).course.memberships.filter(user=request.user).exists() or
                         obj.objects.get(id=foreign_key_id).course.owner == request.user)
         else:
