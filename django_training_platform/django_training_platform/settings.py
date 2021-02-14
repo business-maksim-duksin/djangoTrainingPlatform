@@ -24,7 +24,10 @@ SECRET_KEY = 'l_vxfkb$zrf13nny)wj2v7vs)om!^_tsc^4u%h9v=e*k99au^z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '0.0.0.0',
+]
 
 # Application definition
 
@@ -88,13 +91,24 @@ WSGI_APPLICATION = 'django_training_platform.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test1',
-        'USER': 'root',
-        'PASSWORD': '!MysLvx123',
-        'HOST': 'localhost',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'test1',
+#         'USER': 'root',
+#         'PASSWORD': '!MysLvx123',
+#         'HOST': 'localhost',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -173,4 +187,11 @@ SPECTACULAR_SETTINGS = {
 
 INTERNAL_IPS = [
     '127.0.0.1',
+    '0.0.0.0',
 ]
+
+import socket
+
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
+
