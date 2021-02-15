@@ -18,7 +18,6 @@ inflection==0.5.1
 itypes==1.2.0
 Jinja2==2.11.2
 MarkupSafe==1.1.1
-psycopg2-binary>=2.8
 oauthlib==3.1.0
 packaging==20.7
 pycparser==2.20
@@ -38,4 +37,6 @@ uritemplate==3.0.1
 urllib3==1.26.2
 drf-spectacular==0.13.2
 django-debug-toolbar==3.2
+mysqlclient==2.0.1
+django-mysql==3.8.1
 
