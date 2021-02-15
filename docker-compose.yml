@@ -7,6 +7,8 @@ services:
       - db_variables.env
     volumes:
     - ./test_db:/var/lib/postgresql/data
+    ports:
+      - "32768:5432"
   web:
     build: django_training_platform/.
     command: >
