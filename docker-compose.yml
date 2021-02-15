@@ -16,6 +16,8 @@ services:
              python manage.py makemigrations &&
              python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
+    volumes:
+    - ./django_training_platform/:/web
     ports:
       - "8000:8000"
     depends_on:
