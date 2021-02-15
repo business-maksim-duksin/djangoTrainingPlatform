@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from training_platform.models import OwnedModel, CourseScopeModelInterface, Course, Lesson, Task, CompletedTask, Grade, Comment, Membership
+from django.contrib.auth import get_user_model
 
 
 class IsTeacher(permissions.BasePermission):
@@ -43,11 +44,30 @@ class IsObjRelatedToCourseBase(permissions.BasePermission):
     #     self.message = f"{self.obj} does not belong to course_id {self.foreign_key}"
 
     def has_permission(self, request, view, obj: CourseScopeModelInterface, foreign_key: str):
+        foreign_key = "course"
         foreign_key_id = request.data.get(foreign_key)
         if foreign_key_id:
+            # course_ins = Course.objects.all().select_related("owner").get(id=foreign_key_id)
+            # user_id = request.user.id
+            # user = get_user_model().objects.get(id=user_id)
+            # return bool(course_ins.memberships.filter(user=user).exists() or
+            #             course_ins.owner == user)
 
-            return bool(obj.objects.get(id=foreign_key_id).course.memberships.filter(user=request.user).exists() or
-                        obj.objects.get(id=foreign_key_id).course.owner == request.user)
+            # obj = Course
+            # course_ins = Course.objects.get(id=foreign_key_id)
+            # return bool(course_ins.memberships.filter(user=request.user).exists() or
+            #             course_ins.owner == request.user)
+
+            # obj = Course
+            # return bool(obj.objects.get(id=foreign_key_id).memberships.filter(user=request.user).exists() or
+            #             obj.objects.get(id=foreign_key_id).owner == request.user)
+
+            # obj = Course
+            # return bool(obj.objects.all().filter(id=foreign_key_id).filter(memberships__user=request.user).exists() or
+            #             obj.objects.get(id=foreign_key_id).owner == request.user)
+
+            return bool(Membership.objects.all().filter(user=request.user).filter(course__id=foreign_key_id).exists() or
+                        Course.objects.get(id=foreign_key_id).owner == request.user)
         else:
             return False
 
