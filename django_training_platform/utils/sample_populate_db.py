@@ -51,6 +51,7 @@ def sample_populate_db():
     gr4 = f.GradeFactory(owner=teacher_math, course=course_math, completed_task=ct3_1)
     ct3_2 = f.CompletedTaskFactory(owner=student_3, course=course_math, task=t3)
     gr5 = f.GradeFactory(owner=teacher_stat, course=course_math, completed_task=ct3_2)
+    f.CommentFactory(owner=teacher_stat, course=course_math, grade=gr5)
 
 
 

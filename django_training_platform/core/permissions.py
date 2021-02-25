@@ -23,10 +23,10 @@ class IsCourseMemberOrOwner(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj: CourseScopeModelInterface):
         # course = Course.objects.select_related('memberships').get(id=obj)
-        return bool(obj.course.memberships.filter(user=request.user).exists() or
+        # return bool(obj.course.memberships.filter(user=request.user).exists() or
+        #             obj.course.owner == request.user)
+        return bool(Membership.objects.all().filter(course_id=obj.course).filter(user_id=request.user).exists() or
                     obj.course.owner == request.user)
-        # return bool(course.memberships.filter(user=request.user).exists() or
-        #             course.owner == request.user)
 
 
 class IsObjRelatedToCourseBase(permissions.BasePermission):

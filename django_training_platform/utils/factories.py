@@ -23,7 +23,7 @@ class UserFactory(DjangoModelFactory):
         password = (
             extracted
             if extracted
-            else SelfAttribute("username")
+            else self.username
             # else Faker(
             #     "password",
             #     length=42,
@@ -69,7 +69,7 @@ class TaskFactory(DjangoModelFactory):
 
     class Meta:
         model = m.Task
-        django_get_or_create = ["lesson", "course"]
+        django_get_or_create = ["lesson", "course", "content"]
 
 
 class CompletedTaskFactory(DjangoModelFactory):
@@ -77,7 +77,7 @@ class CompletedTaskFactory(DjangoModelFactory):
 
     class Meta:
         model = m.CompletedTask
-        django_get_or_create = ["task", "course"]
+        django_get_or_create = ["task", "course", "content"]
 
 
 class GradeFactory(DjangoModelFactory):
@@ -93,4 +93,4 @@ class CommentFactory(DjangoModelFactory):
 
     class Meta:
         model = m.Comment
-        django_get_or_create = ["grade", "course"]
+        django_get_or_create = ["grade", "course", "content"]
